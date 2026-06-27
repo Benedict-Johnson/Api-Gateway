@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - service-a
+      - service-b
+
+  service-a:
+    build:
+      context: .
+      dockerfile: docker/service-a/Dockerfile
+    container_name: service-a
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+
+  service-b:
+    build:
+      context: .
+      dockerfile: docker/service-b/Dockerfile
+    container_name: service-b
+    ports:
+      - "8002:8002"
+    volumes:
+      - .:/app

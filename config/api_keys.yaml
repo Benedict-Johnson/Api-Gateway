@@ -1,0 +1,6 @@
+api_keys:
+  - key: secret123
+    client: frontend
+
+  - key: admin123
+    client: admin
