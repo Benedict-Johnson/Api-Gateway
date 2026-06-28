@@ -1,12 +1,13 @@
 from fastapi import FastAPI, HTTPException, Request
-
 from gateway.proxy import proxy
 from middleware.auth import AuthenticationMiddleware
 from routers.registry import RouteRegistry
+from rate_limiter.middleware import RateLimitMiddleware
 
 app = FastAPI(title="Custom API Gateway")
 
 app.add_middleware(AuthenticationMiddleware)
+app.add_middleware(RateLimitMiddleware)
 
 registry = RouteRegistry("config/routes.yaml")
 

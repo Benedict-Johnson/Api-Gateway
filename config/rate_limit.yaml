@@ -1,0 +1,13 @@
+algorithm: token_bucket
+
+fixed_window:
+  limit: 5
+  window: 60
+
+sliding_window:
+  limit: 5
+  window: 60
+
+token_bucket:
+  capacity: 10
+  refill_rate: 1
