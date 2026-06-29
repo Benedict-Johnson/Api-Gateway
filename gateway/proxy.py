@@ -1,39 +1,59 @@
 import httpx
-from fastapi import Request, Response
+from fastapi import Request
+from fastapi.responses import Response, JSONResponse
+
+from gateway.resilience.manager import ResilienceManager
+from gateway.resilience.circuit_breaker import CircuitOpenException
 
 
 class ReverseProxy:
 
     def __init__(self):
-
-        self.client = httpx.AsyncClient(
-            timeout=httpx.Timeout(
-                connect=5.0,
-                read=30.0,
-                write=30.0,
-                pool=30.0,
-            )
-        )
+        self.resilience_manager = ResilienceManager()
 
     async def forward(
         self,
         request: Request,
         target_url: str,
-    ) -> Response:
+        service_name: str,
+    ):
 
-        response = await self.client.request(
-            method=request.method,
-            url=target_url,
-            headers=request.headers,
-            params=request.query_params,
-            content=await request.body(),
-        )
+        body = await request.body()
 
-        return Response(
-            content=response.content,
-            status_code=response.status_code,
-            headers=dict(response.headers),
-        )
+        try:
+            response = await self.resilience_manager.execute(
+                service_name=service_name,
+                method=request.method,
+                url=target_url,
+                headers=request.headers,
+                params=request.query_params,
+                content=body,
+            )
+
+            return Response(
+                content=response.content,
+                status_code=response.status_code,
+                headers=dict(response.headers),
+            )
+
+        except CircuitOpenException:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "detail": "Circuit Open"
+                },
+            )
+
+        except (
+            httpx.TimeoutException,
+            httpx.HTTPStatusError,
+        ):
+            return JSONResponse(
+                status_code=504,
+                content={
+                    "detail": "Gateway Timeout"
+                },
+            )
 
 
 proxy = ReverseProxy()

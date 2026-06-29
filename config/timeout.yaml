@@ -1,0 +1,9 @@
+enabled: true
+
+connect_timeout: 2
+
+read_timeout: 3
+
+write_timeout: 3
+
+pool_timeout: 2

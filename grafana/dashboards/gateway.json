@@ -1,0 +1,56 @@
+{
+  "title": "API Gateway Observability",
+  "timezone": "browser",
+  "refresh": "5s",
+  "schemaVersion": 30,
+  "panels": [
+    {
+      "title": "Gateway RPS",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(rate(gateway_requests_total[1m])) by (method)", "legendFormat": "{{method}}"}]
+    },
+    {
+      "title": "Latency P95/P99",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(gateway_request_duration_seconds_bucket[1m])) by (le))", "legendFormat": "P95"},
+        {"expr": "histogram_quantile(0.99, sum(rate(gateway_request_duration_seconds_bucket[1m])) by (le))", "legendFormat": "P99"}
+      ]
+    },
+    {
+      "title": "Cache Hits / Misses",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "targets": [
+        {"expr": "rate(gateway_cache_hits_total[1m])", "legendFormat": "Hits"},
+        {"expr": "rate(gateway_cache_misses_total[1m])", "legendFormat": "Misses"}
+      ]
+    },
+    {
+      "title": "Circuit Breaker Opens",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "targets": [{"expr": "rate(gateway_circuit_open_total[1m])", "legendFormat": "{{service}}"}]
+    },
+    {
+      "title": "Errors (4xx / 5xx)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+      "targets": [
+        {"expr": "sum(rate(gateway_4xx_total[1m])) by (service)", "legendFormat": "4xx {{service}}"},
+        {"expr": "sum(rate(gateway_5xx_total[1m])) by (service)", "legendFormat": "5xx {{service}}"}
+      ]
+    },
+    {
+      "title": "Retries & Timeouts",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "targets": [
+        {"expr": "rate(gateway_retry_total[1m])", "legendFormat": "Retries {{service}}"},
+        {"expr": "rate(gateway_timeout_total[1m])", "legendFormat": "Timeouts {{service}}"}
+      ]
+    }
+  ]
+}

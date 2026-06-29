@@ -1,0 +1,27 @@
+enabled: true
+
+default_ttl: 60
+
+cacheable_methods:
+  - GET
+
+routes:
+  /users: true
+  /orders: true
+
+invalidate:
+  POST:
+    - /users
+    - /orders
+
+  PUT:
+    - /users
+    - /orders
+
+  PATCH:
+    - /users
+    - /orders
+
+  DELETE:
+    - /users
+    - /orders

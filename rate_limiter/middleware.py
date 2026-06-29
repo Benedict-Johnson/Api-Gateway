@@ -20,6 +20,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         result = await self.manager.allow(client_ip)
 
         if not result.allowed:
+            from observability.metrics import GATEWAY_RATE_LIMIT_HITS
+            from observability.logger import logger
+            
+            GATEWAY_RATE_LIMIT_HITS.inc()
+            logger.warning(f"Rate limit exceeded for IP {client_ip}")
+            
             response = JSONResponse(
                 status_code=429,
                 content={"detail": "Rate limit exceeded"}

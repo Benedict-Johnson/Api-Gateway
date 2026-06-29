@@ -6,3 +6,4 @@ pyyaml
 pytest
 PyJWT
 redis
+prometheus_client==0.20.0
