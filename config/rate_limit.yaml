@@ -1,4 +1,4 @@
-algorithm: token_bucket
+algorithm: leaky_bucket
 
 fixed_window:
   limit: 5
@@ -11,3 +11,7 @@ sliding_window:
 token_bucket:
   capacity: 10
   refill_rate: 1
+
+leaky_bucket:
+  capacity: 10
+  leak_rate: 1

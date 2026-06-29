@@ -1,7 +1,7 @@
 from fastapi import Request
 
-from auth.api_key_strategy import APIKeyStrategy
-from auth.jwt_strategy import JWTStrategy
+from auth.strategies.api_key_strategy import APIKeyStrategy
+from auth.strategies.jwt_strategy import JWTStrategy
 
 
 class AuthenticationManager:

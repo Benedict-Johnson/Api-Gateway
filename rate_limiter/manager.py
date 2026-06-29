@@ -1,33 +1,30 @@
-from config.rate_limit import RateLimitLoader
-from rate_limiter.token_bucket import TokenBucketLimiter
-from rate_limiter.fixed_window import FixedWindowLimiter
-from rate_limiter.sliding_window import SlidingWindowLimiter
-
-
-config = RateLimitLoader(
-    "config/rate_limit.yaml"
-).config
+from rate_limiter.config import RateLimitLoader
+from rate_limiter.algorithms import (
+    TokenBucketLimiter,
+    FixedWindowLimiter,
+    SlidingWindowLimiter,
+    LeakyBucketLimiter
+)
 
 
 class RateLimiterManager:
 
-    def __init__(self):
-
+    def __init__(self, config_loader: RateLimitLoader):
+        self.config_loader = config_loader
         self.algorithms = {
-        "fixed_window": FixedWindowLimiter(),
-        "sliding_window": SlidingWindowLimiter(),
-        "token_bucket": TokenBucketLimiter(),
-    }
+            "fixed_window": FixedWindowLimiter(self.config_loader),
+            "sliding_window": SlidingWindowLimiter(self.config_loader),
+            "token_bucket": TokenBucketLimiter(self.config_loader),
+            "leaky_bucket": LeakyBucketLimiter(self.config_loader),
+        }
 
-        self.limiter = self.algorithms.get(
-            config.algorithm
-        )
-
-        if self.limiter is None:
-            raise ValueError(
-                f"Unknown rate limiter: {config.algorithm}"
-            )
+    @property
+    def limiter(self):
+        algorithm = self.config_loader.config.algorithm
+        limiter = self.algorithms.get(algorithm)
+        if limiter is None:
+            raise ValueError(f"Unknown rate limiter: {algorithm}")
+        return limiter
 
     async def allow(self, key: str):
-
         return await self.limiter.allow_request(key)

@@ -3,26 +3,35 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from rate_limiter.manager import RateLimiterManager
+from rate_limiter.config import RateLimitLoader
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
 
-    def __init__(self, app):
+    def __init__(self, app, config_loader: RateLimitLoader = None):
         super().__init__(app)
-        self.manager = RateLimiterManager()
+        self.config_loader = config_loader or RateLimitLoader("config/rate_limit.yaml")
+        self.manager = RateLimiterManager(self.config_loader)
 
     async def dispatch(self, request: Request, call_next):
 
         client_ip = request.client.host
 
-        allowed = await self.manager.allow(client_ip)
+        result = await self.manager.allow(client_ip)
 
-        if not allowed:
-            return JSONResponse(
+        if not result.allowed:
+            response = JSONResponse(
                 status_code=429,
-                content={
-                    "detail": "Rate limit exceeded"
-                }
+                content={"detail": "Rate limit exceeded"}
             )
+        else:
+            response = await call_next(request)
 
-        return await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(result.limit)
+        response.headers["X-RateLimit-Remaining"] = str(result.remaining)
+        response.headers["X-RateLimit-Algorithm"] = self.manager.limiter.__class__.__name__
+        
+        if result.retry_after is not None:
+            response.headers["Retry-After"] = str(result.retry_after)
+
+        return response

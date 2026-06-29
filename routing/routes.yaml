@@ -1,0 +1,38 @@
+services:
+  user-service:
+    url: http://service-a:8001
+
+  order-service:
+    url: http://service-b:8002
+
+routes:
+  - path: /users
+    service: user-service
+    methods:
+      - GET
+    roles:
+      - user
+      - admin
+
+  - path: /orders
+    service: order-service
+    methods:
+      - GET
+    roles:
+      - admin
+
+  - path: /hello
+    service: user-service
+    methods:
+      - GET
+    roles:
+      - user
+      - admin
+    
+  - path: /slow
+    service: user-service
+    methods:
+      - GET
+    roles:
+      - user
+      - admin

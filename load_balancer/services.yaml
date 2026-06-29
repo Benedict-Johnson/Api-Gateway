@@ -1,0 +1,16 @@
+services:
+
+  - name: user-service
+    instances:
+      - host: service-a
+        port: 8001
+        weight: 2
+
+      - host: service-b
+        port: 8002
+        weight: 1
+
+  - name: order-service
+    instances:
+      - host: service-b
+        port: 8002

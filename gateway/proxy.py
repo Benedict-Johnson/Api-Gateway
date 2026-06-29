@@ -3,8 +3,17 @@ from fastapi import Request, Response
 
 
 class ReverseProxy:
+
     def __init__(self):
-        self.client = httpx.AsyncClient()
+
+        self.client = httpx.AsyncClient(
+            timeout=httpx.Timeout(
+                connect=5.0,
+                read=30.0,
+                write=30.0,
+                pool=30.0,
+            )
+        )
 
     async def forward(
         self,
