@@ -405,5 +405,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ---
 <div align="center">
-<b>Engineered with precision for advanced distributed systems and high-performance asynchronous web architectures.</b>
+<b>Built by Benedict Johnson.</b>
 </div>
