@@ -1,0 +1,9 @@
+request_limits:
+  max_body_size: 1048576
+  max_header_size: 8192
+  max_uri_size: 2048
+  allowed_content_types:
+    - "application/json"
+    - "application/x-www-form-urlencoded"
+    - "multipart/form-data"
+    - "text/plain"

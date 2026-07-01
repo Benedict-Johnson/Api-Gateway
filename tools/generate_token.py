@@ -1,16 +1,9 @@
 import jwt
 
-SECRET_KEY = "super-secret-key"
+from config.settings import settings
 
-payload = {
-    "sub": "freya",
-    "role": "user"
-}
+payload = {"sub": "freya", "role": "user"}
 
-token = jwt.encode(
-    payload,
-    SECRET_KEY,
-    algorithm="HS256"
-)
+token = jwt.encode(payload, settings.JWT_SECRET, algorithm="HS256")
 
 print(token)

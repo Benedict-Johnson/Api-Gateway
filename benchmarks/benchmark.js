@@ -9,9 +9,9 @@ export const options = {
   ],
 };
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = __ENV.BASE_URL || 'http://localhost:8000';
 const HEADERS = {
-  'X-API-Key': 'secret123',
+  'X-API-Key': __ENV.API_KEY_SECRET || 'secret123',
 };
 
 export default function () {

@@ -14,9 +14,7 @@ class WeightedRoundRobinBalancer:
             expanded = []
 
             for instance in service.instances:
-                expanded.extend(
-                    [instance] * instance.weight
-                )
+                expanded.extend([instance] * instance.weight)
 
             self.sequence[service.name] = expanded
             self.indices[service.name] = 0
@@ -27,8 +25,6 @@ class WeightedRoundRobinBalancer:
 
         instance = seq[index]
 
-        self.indices[service.name] = (
-            index + 1
-        ) % len(seq)
+        self.indices[service.name] = (index + 1) % len(seq)
 
         return instance

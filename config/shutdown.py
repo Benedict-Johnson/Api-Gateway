@@ -1,9 +1,12 @@
 from pydantic import BaseModel
+
 from config.yaml_loader import YAMLLoader
+
 
 class ShutdownConfig(BaseModel):
     enabled: bool = True
     graceful_timeout: int = 30
+
 
 class ShutdownLoader:
     def __init__(self, path: str = "config/shutdown.yaml"):

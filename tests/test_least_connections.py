@@ -1,12 +1,12 @@
 import asyncio
+
 import httpx
 
+from config.settings import settings
 
 URL = "http://host.docker.internal:8000/slow"
 
-HEADERS = {
-    "X-API-Key": "secret123"
-}
+HEADERS = {"X-API-Key": settings.API_KEY_SECRET}
 
 
 async def send_request(client, request_id):
@@ -28,12 +28,10 @@ async def main():
 
     async with httpx.AsyncClient(timeout=20) as client:
 
-        tasks = [
-            send_request(client, i)
-            for i in range(20)
-        ]
+        tasks = [send_request(client, i) for i in range(20)]
 
         await asyncio.gather(*tasks)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

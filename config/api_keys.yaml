@@ -1,6 +1,5 @@
 api_keys:
-  - key: secret123
+  - name: frontend
+    role: admin
     client: frontend
-
-  - key: admin123
-    client: admin
+    env: API_KEY_SECRET

@@ -17,6 +17,7 @@ routes:
     roles:
       - user
       - admin
+      - service
 
   - path: /orders
     service: order-service

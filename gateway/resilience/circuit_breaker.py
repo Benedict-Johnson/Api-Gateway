@@ -1,25 +1,30 @@
-import time
 import asyncio
-import httpx
+import time
 from enum import Enum
+
+import httpx
+
 from config.circuit_breaker import CircuitBreakerLoader
-from observability.logger import logger
 from observability.context import circuit_state_var
+from observability.logger import logger
 from observability.metrics import GATEWAY_CIRCUIT_OPEN_TOTAL
+
 
 class CircuitOpenException(Exception):
     pass
+
 
 class CircuitState(Enum):
     CLOSED = "CLOSED"
     OPEN = "OPEN"
     HALF_OPEN = "HALF_OPEN"
 
+
 class CircuitBreaker:
     def __init__(self, service_name: str, config):
         self.service_name = service_name
         self.config = config
-        
+
         self.state = CircuitState.CLOSED
         self.failure_count = 0
         self.success_count = 0
@@ -69,7 +74,7 @@ class CircuitBreaker:
     async def allow_request(self) -> bool:
         if not self.config.enabled:
             return True
-            
+
         async with self.lock:
             current_state = await self.get_state()
             if current_state == CircuitState.OPEN:
@@ -77,7 +82,9 @@ class CircuitBreaker:
                 return False
             if current_state == CircuitState.HALF_OPEN:
                 if self.half_open_in_progress:
-                    logger.debug(f"Rejecting request to {self.service_name} (Circuit HALF_OPEN concurrent lock)")
+                    logger.debug(
+                        f"Rejecting request to {self.service_name} (Circuit HALF_OPEN concurrent lock)"
+                    )
                     return False
                 self.half_open_in_progress = True
                 return True
@@ -96,20 +103,24 @@ class CircuitBreakerPolicy:
                 self.breakers[service_name] = CircuitBreaker(service_name, self.config)
             return self.breakers[service_name]
 
-    async def execute(self, retry_policy, client, service_name, method, url, headers, params, content):
+    async def execute(
+        self, retry_policy, client, service_name, method, url, headers, params, content
+    ):
         breaker = await self.get_breaker(service_name)
-        
+
         current_state = await breaker.get_state()
         circuit_state_var.set(current_state.value)
-        
+
         if not await breaker.allow_request():
             raise CircuitOpenException()
-            
+
         try:
-            response = await retry_policy.execute(client, method, url, headers, params, content)
+            response = await retry_policy.execute(
+                client, method, url, headers, params, content
+            )
             await breaker.record_success()
             return response
-            
+
         except (httpx.TimeoutException, httpx.HTTPStatusError) as e:
             await breaker.record_failure()
             raise e

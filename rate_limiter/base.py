@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from rate_limiter.results import RateLimitResult
+
 
 class RateLimiter(ABC):
 

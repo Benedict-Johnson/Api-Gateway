@@ -10,16 +10,10 @@ class DiscoveryRegistry:
 
     def register(self, instance: ServiceInstance):
 
-        existing = self.get_instance(
-            instance.service,
-            instance.host,
-            instance.port
-        )
+        existing = self.get_instance(instance.service, instance.host, instance.port)
 
         if existing is None:
-            self.services[
-                instance.service
-            ].append(instance)
+            self.services[instance.service].append(instance)
             return
 
         existing.last_seen = instance.last_seen
@@ -27,42 +21,19 @@ class DiscoveryRegistry:
     def get(self, service):
         return self.services.get(service, [])
 
-    def get_instance(
-        self,
-        service,
-        host,
-        port
-    ):
+    def get_instance(self, service, host, port):
 
         for instance in self.services[service]:
 
-            if (
-                instance.host == host
-                and
-                instance.port == port
-            ):
+            if instance.host == host and instance.port == port:
                 return instance
 
         return None
 
-    def deregister(
-        self,
-        service,
-        host,
-        port
-    ):
+    def deregister(self, service, host, port):
 
         self.services[service] = [
-
-            i
-
-            for i in self.services[service]
-
-            if not (
-                i.host == host
-                and
-                i.port == port
-            )
+            i for i in self.services[service] if not (i.host == host and i.port == port)
         ]
 
 

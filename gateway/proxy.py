@@ -1,9 +1,9 @@
 import httpx
 from fastapi import Request
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import JSONResponse, Response
 
-from gateway.resilience.manager import ResilienceManager
 from gateway.resilience.circuit_breaker import CircuitOpenException
+from gateway.resilience.manager import ResilienceManager
 
 
 class ReverseProxy:
@@ -39,9 +39,7 @@ class ReverseProxy:
         except CircuitOpenException:
             return JSONResponse(
                 status_code=503,
-                content={
-                    "detail": "Circuit Open"
-                },
+                content={"detail": "Circuit Open"},
             )
 
         except (
@@ -50,9 +48,7 @@ class ReverseProxy:
         ):
             return JSONResponse(
                 status_code=504,
-                content={
-                    "detail": "Gateway Timeout"
-                },
+                content={"detail": "Gateway Timeout"},
             )
 
 

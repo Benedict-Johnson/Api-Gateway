@@ -3,20 +3,20 @@ from fastapi.responses import Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from cache.manager import cache_manager
+from observability.context import cache_status_var
 from observability.logger import logger
 from observability.metrics import GATEWAY_CACHE_HITS, GATEWAY_CACHE_MISSES
-from observability.context import cache_status_var
 
 
 class CacheMiddleware(BaseHTTPMiddleware):
-    
-    async def dispatch(
-    self,
-    request: Request,
-    call_next,
-):
 
-    # Handle write requests first
+    async def dispatch(
+        self,
+        request: Request,
+        call_next,
+    ):
+
+        # Handle write requests first
         if request.method in [
             "POST",
             "PUT",
@@ -42,7 +42,9 @@ class CacheMiddleware(BaseHTTPMiddleware):
 
         cached = await cache_manager.get(request)
 
-        logger.debug(f"Cache key: {request.method}:{request.url.path}, Hit: {cached is not None}")
+        logger.debug(
+            f"Cache key: {request.method}:{request.url.path}, Hit: {cached is not None}"
+        )
 
         if cached:
             GATEWAY_CACHE_HITS.inc()
@@ -50,9 +52,7 @@ class CacheMiddleware(BaseHTTPMiddleware):
             return Response(
                 content=cached,
                 media_type="application/json",
-                headers={
-                    "X-Cache": "HIT"
-                }
+                headers={"X-Cache": "HIT"},
             )
 
         response = await call_next(request)
@@ -63,7 +63,7 @@ class CacheMiddleware(BaseHTTPMiddleware):
 
             async for chunk in response.body_iterator:
                 body += chunk
-            
+
             logger.debug("Writing response to Redis...")
             await cache_manager.set(
                 request,
@@ -78,7 +78,7 @@ class CacheMiddleware(BaseHTTPMiddleware):
 
             GATEWAY_CACHE_MISSES.inc()
             cache_status_var.set("MISS")
-            
+
             return Response(
                 content=body,
                 status_code=response.status_code,

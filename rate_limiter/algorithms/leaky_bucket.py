@@ -1,8 +1,8 @@
-import time
 import math
+import time
 
-from rate_limiter.config import RateLimitLoader
 from rate_limiter.base import RateLimiter
+from rate_limiter.config import RateLimitLoader
 from rate_limiter.redis import redis_client
 from rate_limiter.results import RateLimitResult
 
@@ -30,28 +30,14 @@ class LeakyBucketLimiter(RateLimiter):
 
         elapsed = now - last
         level = max(0, level - elapsed * leak_rate)
-        
-        remaining = max(0, capacity - math.ceil(level))
 
         if level >= capacity:
-            return RateLimitResult(
-                allowed=False,
-                limit=capacity,
-                remaining=0
-            )
+            return RateLimitResult(allowed=False, limit=capacity, remaining=0)
 
         level += 1
 
-        await redis_client.hset(
-            redis_key,
-            mapping={
-                "level": level,
-                "last": now
-            }
-        )
+        await redis_client.hset(redis_key, mapping={"level": level, "last": now})
 
         return RateLimitResult(
-            allowed=True,
-            limit=capacity,
-            remaining=max(0, capacity - math.ceil(level))
+            allowed=True, limit=capacity, remaining=max(0, capacity - math.ceil(level))
         )

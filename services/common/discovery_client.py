@@ -1,4 +1,5 @@
 import asyncio
+
 import httpx
 
 
@@ -19,11 +20,7 @@ class DiscoveryClient:
         self.api_key = api_key
         self.gateway = gateway
 
-        self.client = httpx.AsyncClient(
-            headers={
-                "X-API-Key": self.api_key
-            }
-        )
+        self.client = httpx.AsyncClient(headers={"X-API-Key": self.api_key})
 
     async def register(self):
 
@@ -34,18 +31,13 @@ class DiscoveryClient:
             try:
 
                 response = await self.client.post(
-
                     f"{self.gateway}/discovery/register",
-
                     json={
-
                         "service": self.service,
                         "host": self.host,
                         "port": self.port,
                         "weight": 1,
-
                     },
-
                 )
 
                 response.raise_for_status()
@@ -56,16 +48,11 @@ class DiscoveryClient:
 
             except Exception:
 
-                print(
-                    f"[DISCOVERY] Gateway unavailable "
-                    f"(attempt {attempt + 1}/10)"
-                )
+                print(f"[DISCOVERY] Gateway unavailable " f"(attempt {attempt + 1}/10)")
 
                 await asyncio.sleep(2)
 
-        raise RuntimeError(
-            "Unable to register service."
-        )
+        raise RuntimeError("Unable to register service.")
 
     async def heartbeat(self):
 
@@ -76,17 +63,12 @@ class DiscoveryClient:
             try:
 
                 await self.client.post(
-
                     f"{self.gateway}/discovery/heartbeat",
-
                     json={
-
                         "service": self.service,
                         "host": self.host,
                         "port": self.port,
-
                     },
-
                 )
 
             except Exception:
@@ -102,25 +84,19 @@ class DiscoveryClient:
         try:
 
             await self.client.request(
-
                 "DELETE",
-
                 f"{self.gateway}/discovery/deregister",
-
                 json={
-
                     "service": self.service,
                     "host": self.host,
                     "port": self.port,
-
                 },
-
             )
 
         except Exception:
 
             print("[DISCOVERY] Deregistration failed")
-    
+
     async def run(self):
 
         while True:

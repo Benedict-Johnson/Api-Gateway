@@ -17,8 +17,6 @@ class RoundRobinBalancer:
 
         instance = instances[index]
 
-        self.indices[service.name] = (
-            index + 1
-        ) % len(instances)
+        self.indices[service.name] = (index + 1) % len(instances)
 
         return instance

@@ -1,4 +1,5 @@
 import os
+
 import yaml
 
 from routing.models import GatewayConfig
@@ -17,7 +18,7 @@ class RouteRegistry:
 
     def reload(self):
 
-        with open(self.config_path, "r") as file:
+        with open(self.config_path) as file:
             raw = yaml.safe_load(file)
 
         self.config = GatewayConfig(**raw)

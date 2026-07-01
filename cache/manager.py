@@ -8,9 +8,7 @@ class CacheManager:
 
     def __init__(self):
 
-        self.config = CacheConfigLoader(
-            "cache/config.yaml"
-        ).config
+        self.config = CacheConfigLoader("cache/config.yaml").config
 
     async def get(self, request):
 
@@ -33,7 +31,7 @@ class CacheManager:
         value = await cache_redis.client.get(key)
 
         logger.debug(f"Redis returned: {value is not None}")
-    
+
     async def invalidate(self, request):
 
         paths = self.config.invalidate.get(
@@ -42,14 +40,10 @@ class CacheManager:
         )
 
         if request.url.path in paths:
-            keys = await cache_redis.client.keys(
-                f"GET:{request.url.path}*"
-            )
+            keys = await cache_redis.client.keys(f"GET:{request.url.path}*")
 
             if keys:
-                await cache_redis.client.delete(
-                    *keys
-                )
+                await cache_redis.client.delete(*keys)
                 logger.info(f"Invalidated cache keys: {keys}")
 
 

@@ -1,10 +1,10 @@
-from rate_limiter.config import RateLimitLoader
 from rate_limiter.algorithms import (
-    TokenBucketLimiter,
     FixedWindowLimiter,
+    LeakyBucketLimiter,
     SlidingWindowLimiter,
-    LeakyBucketLimiter
+    TokenBucketLimiter,
 )
+from rate_limiter.config import RateLimitLoader
 
 
 class RateLimiterManager:

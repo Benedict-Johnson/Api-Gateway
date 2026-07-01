@@ -1,6 +1,6 @@
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from auth.manager import AuthenticationManager
 from routing.registry import RouteRegistry
@@ -22,25 +22,16 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         user = await self.auth.authenticate(request)
 
         if user is None:
-            return JSONResponse(
-                status_code=401,
-                content={"detail": "Unauthorized"}
-            )
+            return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
 
-        route = self.registry.resolve(
-            request.url.path,
-            request.method
-        )
+        route = self.registry.resolve(request.url.path, request.method)
 
         if route and route.roles:
 
             role = user.get("role")
 
             if role not in route.roles:
-                return JSONResponse(
-                    status_code=403,
-                    content={"detail": "Forbidden"}
-                )
+                return JSONResponse(status_code=403, content={"detail": "Forbidden"})
 
         request.state.user = user
 

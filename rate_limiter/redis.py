@@ -1,13 +1,16 @@
 import redis.asyncio as redis
 
+from config.settings import settings
+
 
 class RedisClient:
 
     def __init__(self):
         self.client = redis.Redis(
-            host="redis",
-            port=6379,
-            decode_responses=True
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
+            password=settings.REDIS_PASSWORD or None,
+            decode_responses=True,
         )
 
     async def get(self, name):

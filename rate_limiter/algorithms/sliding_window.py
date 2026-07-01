@@ -1,7 +1,7 @@
 import time
 
-from rate_limiter.config import RateLimitLoader
 from rate_limiter.base import RateLimiter
+from rate_limiter.config import RateLimitLoader
 from rate_limiter.redis import redis_client
 from rate_limiter.results import RateLimitResult
 
@@ -25,15 +25,11 @@ class SlidingWindowLimiter(RateLimiter):
         )
 
         current = await redis_client.zcard(redis_key)
-        
+
         remaining = max(0, limit - (current + 1))
-        
+
         if current >= limit:
-            return RateLimitResult(
-                allowed=False,
-                limit=limit,
-                remaining=0
-            )
+            return RateLimitResult(allowed=False, limit=limit, remaining=0)
 
         await redis_client.zadd(
             redis_key,
@@ -42,8 +38,4 @@ class SlidingWindowLimiter(RateLimiter):
 
         await redis_client.expire(redis_key, window)
 
-        return RateLimitResult(
-            allowed=True,
-            limit=limit,
-            remaining=remaining
-        )
+        return RateLimitResult(allowed=True, limit=limit, remaining=remaining)

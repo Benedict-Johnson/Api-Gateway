@@ -1,7 +1,6 @@
 import yaml
 
-from load_balancer.models import Service
-from load_balancer.models import ServiceInstance
+from load_balancer.models import Service, ServiceInstance
 
 
 class ServiceRegistry:
@@ -23,13 +22,12 @@ class ServiceRegistry:
                     ServiceInstance(
                         host=instance["host"],
                         port=instance["port"],
-                        weight=instance.get("weight", 1)
+                        weight=instance.get("weight", 1),
                     )
                 )
 
             self.services[service["name"]] = Service(
-                name=service["name"],
-                instances=instances
+                name=service["name"], instances=instances
             )
 
     def get(self, name: str):

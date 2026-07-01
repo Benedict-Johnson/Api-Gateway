@@ -7,3 +7,10 @@ pytest
 PyJWT
 redis
 prometheus_client==0.20.0
+pydantic-settings
+psycopg2-binary
+sqlalchemy
+bcrypt
+black
+isort
+ruff

@@ -2,8 +2,8 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from rate_limiter.manager import RateLimiterManager
 from rate_limiter.config import RateLimitLoader
+from rate_limiter.manager import RateLimiterManager
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -20,23 +20,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         result = await self.manager.allow(client_ip)
 
         if not result.allowed:
-            from observability.metrics import GATEWAY_RATE_LIMIT_HITS
             from observability.logger import logger
-            
+            from observability.metrics import GATEWAY_RATE_LIMIT_HITS
+
             GATEWAY_RATE_LIMIT_HITS.inc()
             logger.warning(f"Rate limit exceeded for IP {client_ip}")
-            
+
             response = JSONResponse(
-                status_code=429,
-                content={"detail": "Rate limit exceeded"}
+                status_code=429, content={"detail": "Rate limit exceeded"}
             )
         else:
             response = await call_next(request)
 
         response.headers["X-RateLimit-Limit"] = str(result.limit)
         response.headers["X-RateLimit-Remaining"] = str(result.remaining)
-        response.headers["X-RateLimit-Algorithm"] = self.manager.limiter.__class__.__name__
-        
+        response.headers["X-RateLimit-Algorithm"] = (
+            self.manager.limiter.__class__.__name__
+        )
+
         if result.retry_after is not None:
             response.headers["Retry-After"] = str(result.retry_after)
 

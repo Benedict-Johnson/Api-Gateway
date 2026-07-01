@@ -15,11 +15,12 @@ retry_count_var = contextvars.ContextVar("retry_count", default=0)
 # Circuit Breaker state
 circuit_state_var = contextvars.ContextVar("circuit_state", default="-")
 
+
 def get_log_context():
     return {
         "req_id": request_id_var.get(),
         "service": service_name_var.get(),
         "cache": cache_status_var.get(),
         "retries": retry_count_var.get(),
-        "circuit": circuit_state_var.get()
+        "circuit": circuit_state_var.get(),
     }

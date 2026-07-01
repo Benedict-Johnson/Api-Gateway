@@ -1,4 +1,5 @@
 import os
+
 import yaml
 
 
@@ -16,7 +17,7 @@ class YAMLLoader:
         if not os.path.exists(self.path):
             raise FileNotFoundError(f"Configuration file not found: {self.path}")
 
-        with open(self.path, "r") as file:
+        with open(self.path) as file:
             self.raw = yaml.safe_load(file) or {}
 
         self.last_modified = os.path.getmtime(self.path)
