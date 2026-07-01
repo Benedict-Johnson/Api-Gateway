@@ -35,6 +35,12 @@ class Settings(BaseSettings):
         description="Operating environment (development, staging, production)",
     )
     LOG_LEVEL: str = Field("INFO", description="Logging level")
+    # TEMPORARY DOCUMENTATION / DEMO MODE: Bypasses authentication, RBAC, and rate limiting for screenshot generation.
+    # Must remain disabled (DEMO_MODE=false) in production environments!
+    DEMO_MODE: bool = Field(
+        False,
+        description="Temporary documentation mode for generating README screenshots. Must be False in production.",
+    )
 
     # Security
     ENABLE_TLS: bool = Field(False, description="Whether TLS is enabled")

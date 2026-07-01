@@ -27,4 +27,19 @@ class RateLimiterManager:
         return limiter
 
     async def allow(self, key: str):
+        from config.settings import settings
+
+        if settings.DEMO_MODE:
+            # TEMPORARY DOCUMENTATION / DEMO MODE: Bypass rate limiting for screenshot generation.
+            # Must remain disabled (DEMO_MODE=false) in production environments!
+            from rate_limiter.results import RateLimitResult
+
+            return RateLimitResult(
+                allowed=True,
+                limit=999999,
+                remaining=999999,
+                retry_after=None,
+                reset_at=None,
+            )
+
         return await self.limiter.allow_request(key)

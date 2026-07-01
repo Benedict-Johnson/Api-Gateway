@@ -15,6 +15,14 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         self.registry = RouteRegistry("routing/routes.yaml")
 
     async def dispatch(self, request: Request, call_next):
+        from config.settings import settings
+
+        if settings.DEMO_MODE:
+            # TEMPORARY DOCUMENTATION / DEMO MODE: Bypass API key authentication and RBAC checks for all routes
+            # (including /docs, /openapi.json, /redoc, /metrics, /health, /live, /ready).
+            # Must remain disabled (DEMO_MODE=false) in production environments!
+            request.state.user = {"client": "demo-client", "role": "admin"}
+            return await call_next(request)
 
         if request.url.path in ["/", "/health", "/live", "/ready", "/metrics"]:
             return await call_next(request)

@@ -37,6 +37,13 @@ class CreateAPIKeyResponse(APIKeyResponse):
 
 
 def get_current_admin(request: Request):
+    from config.settings import settings
+
+    if settings.DEMO_MODE:
+        # TEMPORARY DOCUMENTATION / DEMO MODE: Bypass admin RBAC check for screenshot generation.
+        # Must remain disabled (DEMO_MODE=false) in production environments!
+        return {"client": "demo-client", "role": "admin"}
+
     user = getattr(request.state, "user", None)
     if not user or user.get("role") != "admin":
         actor = f"client:{user.get('client')}" if user else "unauthenticated"
